@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class HeatMeasurement {
+public class TemperatureMeasurement {
 
   private int degreeCelsius;
 

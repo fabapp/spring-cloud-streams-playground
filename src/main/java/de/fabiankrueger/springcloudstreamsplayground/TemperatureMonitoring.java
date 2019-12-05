@@ -3,8 +3,8 @@ package de.fabiankrueger.springcloudstreamsplayground;
 import org.springframework.stereotype.Service;
 
 @Service
-public class HeatMonitoring {
+public class TemperatureMonitoring {
 
-  public void monitor(HeatMeasurement payload) {
+  public void monitor(TemperatureMeasurement payload) {
   }
 }

@@ -10,39 +10,38 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.cloud.stream.test.binder.TestSupportBinderAutoConfiguration;
-import org.springframework.context.event.EventListener;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.KafkaHeaders;
 import org.springframework.kafka.support.SendResult;
-import org.springframework.kafka.test.EmbeddedKafkaBroker;
 import org.springframework.kafka.test.context.EmbeddedKafka;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
 
 @SpringBootTest(properties = {
     "spring.autoconfigure.exclude=org.springframework.cloud.stream.test.binder.TestSupportBinderAutoConfiguration",
-    "spring.cloud.stream.bindings.heatMeasurements.destination=measurements-heat"})
-@EmbeddedKafka // (topics = {"measurements-heat"})
-public class HeatMeasurementsInboundAdapterIT {
+    "spring.cloud.stream.bindings.temperatureMeasurements.destination=" + TemperatureMeasurementsInboundAdapterIT.TOPIC})
+@EmbeddedKafka
+public class TemperatureMeasurementsInboundAdapterIT {
+
+  static final String TOPIC = "temperature-measurements";
 
   @Autowired
-  KafkaTemplate<String, HeatMeasurement> kafkaTemplate;
+  KafkaTemplate<String, TemperatureMeasurement> kafkaTemplate;
 
   @MockBean
-  HeatMonitoring heatMonitoring;
+  TemperatureMonitoring temperatureMonitoring;
 
   @Test
   public void onInboundHeatMeasurement() throws JsonProcessingException, ExecutionException, InterruptedException {
-    HeatMeasurement heatMeasurement = new HeatMeasurement(23);
+    TemperatureMeasurement temperatureMeasurement = new TemperatureMeasurement(23);
     ObjectMapper objectMapper = new ObjectMapper();
-    byte[] heatMeasurementBytes = objectMapper.writeValueAsBytes(heatMeasurement);
+    byte[] heatMeasurementBytes = objectMapper.writeValueAsBytes(temperatureMeasurement);
     Message<byte[]> message = MessageBuilder
         .withPayload(heatMeasurementBytes)
-        .setHeader(KafkaHeaders.TOPIC, "measurements-heat")
+        .setHeader(KafkaHeaders.TOPIC, TOPIC)
         .build();
-    SendResult<String, HeatMeasurement> stringHeatMeasurementSendResult = kafkaTemplate.send(message).get();
-    await().untilAsserted(() -> verify(heatMonitoring).monitor(heatMeasurement));
+    kafkaTemplate.send(message).get();
+    await().untilAsserted(() -> verify(temperatureMonitoring).monitor(temperatureMeasurement));
   }
 
 }

@@ -5,6 +5,6 @@ import java.util.Date;
 import lombok.Data;
 
 @Data
-public class HeatAlarm {
+public class TemperatureAlarm {
   private Date instant = new Date();
 }
