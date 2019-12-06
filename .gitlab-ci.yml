@@ -2,18 +2,20 @@ image: java:8
 
 stages:
   - build
-  - integration-test
+  - integrationtest
 
 before_script:
   - chmod +x mvnw
 
 build:
   stage: build
-  script: ./mvnw package
+  script:
+    - "./mvnw package"
   artifacts:
     paths:
       - target/spring-cloud-streams-playground-0.0.1-SNAPSHOT.jar
 
-integration-test:
-  stage: integration-test
-  script: ./mvnw failsafe:integration-test
+integrationtest:
+  stage: integrationtest
+  script:
+    - "./mvnw verify"
