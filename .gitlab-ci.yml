@@ -9,7 +9,7 @@ before_script:
 
 build:
   stage: build
-  script: ./mvnw package
+  script: ./mvnw clean failsafe:integration-test package
   artifacts:
     paths:
       - target/spring-cloud-stream-playground-0.0.1-SNAPSHOT.jar
