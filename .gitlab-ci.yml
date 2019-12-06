@@ -12,3 +12,7 @@ variables:
 maven_job:
   script:
     - mvn $MAVEN_CLI_OPTS test
+
+integratontest:
+  script:
+    - mvn failsafe:integration-test
