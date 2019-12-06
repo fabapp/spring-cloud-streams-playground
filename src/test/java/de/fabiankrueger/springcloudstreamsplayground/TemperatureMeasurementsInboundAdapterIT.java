@@ -6,6 +6,8 @@ import static org.mockito.Mockito.verify;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.concurrent.ExecutionException;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -13,6 +15,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.KafkaHeaders;
 import org.springframework.kafka.support.SendResult;
+import org.springframework.kafka.test.EmbeddedKafkaBroker;
 import org.springframework.kafka.test.context.EmbeddedKafka;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
@@ -31,6 +34,15 @@ public class TemperatureMeasurementsInboundAdapterIT {
   @MockBean
   TemperatureMonitoring temperatureMonitoring;
 
+  @Autowired
+  EmbeddedKafkaBroker embeddedKafkaBroker;
+  static EmbeddedKafkaBroker staticKafkaBroker;
+
+  @BeforeEach
+  public void setup() {
+    staticKafkaBroker = embeddedKafkaBroker;
+  }
+
   @Test
   public void onInboundHeatMeasurement() throws JsonProcessingException, ExecutionException, InterruptedException {
     TemperatureMeasurement temperatureMeasurement = new TemperatureMeasurement(23);
@@ -44,4 +56,9 @@ public class TemperatureMeasurementsInboundAdapterIT {
     await().untilAsserted(() -> verify(temperatureMonitoring).monitor(temperatureMeasurement));
   }
 
+  @AfterAll
+  public static void tearDown() {
+    staticKafkaBroker.getKafkaServers().forEach(b -> b.shutdown());
+    staticKafkaBroker.getKafkaServers().forEach(b -> b.awaitShutdown());
+  }
 }
