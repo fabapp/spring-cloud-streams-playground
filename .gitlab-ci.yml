@@ -32,11 +32,8 @@ cache:
   stage: test
   script:
     - 'mvn $MAVEN_CLI_OPTS verify'
-
-.integration-test: &integration-test
-  stage: integration-test
-  script:
     - 'mvn $MAVEN_CLI_OPTS failsafe:integration-test'
+
 #  except:
 #    - master
 
