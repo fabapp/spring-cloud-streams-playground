@@ -5,10 +5,13 @@ import static org.awaitility.Awaitility.await;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.kafka.test.EmbeddedKafkaBroker;
 import org.springframework.kafka.test.context.EmbeddedKafka;
 import org.springframework.messaging.support.GenericMessage;
 
@@ -19,9 +22,20 @@ import org.springframework.messaging.support.GenericMessage;
 public class TemperatureAlarmOutboundAdapterIT {
 
   static final String TOPIC = "temperature-alarm";
+
   @Autowired
   TemperatureAlarmOutboundAdapter temperatureAlarmOutboundAdapter;
+
   TemperatureAlarm receivedTemperatureAlarm;
+
+  @Autowired
+  EmbeddedKafkaBroker embeddedKafkaBroker;
+  static EmbeddedKafkaBroker staticKafkaBroker;
+
+  @BeforeEach
+  public void setup() {
+    staticKafkaBroker = embeddedKafkaBroker;
+  }
 
   @Test
   public void sendHeatAlarm() throws InterruptedException {
@@ -35,5 +49,11 @@ public class TemperatureAlarmOutboundAdapterIT {
   public void onHeatAlarm(GenericMessage heatAlarmMessage) throws IOException {
     ObjectMapper objectMapper = new ObjectMapper();
     receivedTemperatureAlarm = objectMapper.readValue((byte[]) heatAlarmMessage.getPayload(), TemperatureAlarm.class);
+  }
+
+  @AfterAll
+  public static void tearDown() {
+    staticKafkaBroker.getKafkaServers().forEach(b -> b.shutdown());
+    staticKafkaBroker.getKafkaServers().forEach(b -> b.awaitShutdown());
   }
 }
