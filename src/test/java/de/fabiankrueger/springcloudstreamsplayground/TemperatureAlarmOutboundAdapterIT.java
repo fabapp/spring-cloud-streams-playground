@@ -17,6 +17,7 @@ import org.springframework.messaging.support.GenericMessage;
 
 @SpringBootTest(properties = {
     "spring.autoconfigure.exclude=org.springframework.cloud.stream.test.binder.TestSupportBinderAutoConfiguration",
+    "spring.kafka.consumer.auto-offset-reset=earliest", // lets the consumer read messages that might have been sent before consumer started
     "spring.cloud.stream.bindings.temperatureAlarm.destination=" + TemperatureAlarmOutboundAdapterIT.TOPIC})
 @EmbeddedKafka
 public class TemperatureAlarmOutboundAdapterIT {
