@@ -5,16 +5,20 @@ import static de.fabiankrueger.springcloudstreamsplayground.HeatMeasurementsInbo
 
 import de.fabiankrueger.springcloudstreamsplayground.HeatMeasurementsInboundAdapter.TemperatureMeasurementsBinder;
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.cloud.stream.annotation.EnableBinding;
 import org.springframework.cloud.stream.annotation.Input;
 import org.springframework.cloud.stream.annotation.StreamListener;
+import org.springframework.cloud.stream.messaging.Sink;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.SubscribableChannel;
 import org.springframework.stereotype.Component;
 
+import java.util.Map;
+
 @Component
 @EnableBinding(TemperatureMeasurementsBinder.class)
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class HeatMeasurementsInboundAdapter {
 
   private final TemperatureMonitoring temperatureMonitoring;

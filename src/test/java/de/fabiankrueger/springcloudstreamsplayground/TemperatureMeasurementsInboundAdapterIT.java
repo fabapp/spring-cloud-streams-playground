@@ -22,7 +22,8 @@ import org.springframework.messaging.support.MessageBuilder;
 
 @SpringBootTest(properties = {
     "spring.autoconfigure.exclude=org.springframework.cloud.stream.test.binder.TestSupportBinderAutoConfiguration",
-    "spring.cloud.stream.bindings.temperatureMeasurements.destination=" + TemperatureMeasurementsInboundAdapterIT.TOPIC})
+    "spring.cloud.stream.bindings.temperatureMeasurements.destination=" + TemperatureMeasurementsInboundAdapterIT.TOPIC,
+    "spring.kafka.bootstrap-servers=${spring.embedded.kafka.brokers}"})
 @EmbeddedKafka
 public class TemperatureMeasurementsInboundAdapterIT {
 
