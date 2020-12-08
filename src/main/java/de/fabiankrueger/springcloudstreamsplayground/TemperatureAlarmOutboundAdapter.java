@@ -21,8 +21,8 @@ public class TemperatureAlarmOutboundAdapter {
 
   private final TemperatureAlarmBinder temperatureAlarmBinder;
 
-  public void send(TemperatureAlarm temperatureAlarm) {
-    temperatureAlarmBinder.channel().send(MessageBuilder.withPayload(temperatureAlarm).build());
+  public boolean send(TemperatureAlarm temperatureAlarm) {
+    return temperatureAlarmBinder.channel().send(MessageBuilder.withPayload(temperatureAlarm).build());
   }
 
 }
