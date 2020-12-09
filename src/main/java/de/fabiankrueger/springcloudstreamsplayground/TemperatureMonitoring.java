@@ -18,6 +18,7 @@ public class TemperatureMonitoring {
       TemperatureAlarm temperatureAlarm = new TemperatureAlarm();
       temperatureAlarm.setTemperature(measurement.getDegreeCelsius());
       alarmRepository.save(temperatureAlarm);
+      problemInjection.beforePublishingMessage();
       alarmOutboundAdapter.send(temperatureAlarm);
       problemInjection.beforeReturning();
     }

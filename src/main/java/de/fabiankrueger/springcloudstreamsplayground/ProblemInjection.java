@@ -10,4 +10,7 @@ import java.util.function.Supplier;
 public class ProblemInjection {
     public void beforeReturning() {
     }
+
+    public void beforePublishingMessage() {
+    }
 }

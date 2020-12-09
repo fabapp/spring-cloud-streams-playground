@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.awaitility.Awaitility;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -77,6 +78,31 @@ class TransactionalTemperatureMonitoringTest {
         doThrow(exception).when(problemInjection).beforeReturning();
         TemperatureMeasurement measurement = new TemperatureMeasurement(11);
         assertThatThrownBy(() -> temperatureMonitoring.monitor(measurement)).isSameAs(exception);
+        assertThat(repository.findAll()).isEmpty();
+        Awaitility.await().untilAsserted(() -> assertThat(temperatureAlarm).isNull());
+    }
+
+    /**
+     * Writes to db but cannot publish to Kafka, then Kafka comes up before returning the method
+     * -> Database tx IS NOT committed
+     * -> Kafka message IS NOT committed
+     */
+    @Test
+    @Disabled("Takes very long, enable when you want to verify that the behaviour is same as if when any other exception is thrown")
+    public void anotherUnhappyPath() {
+        doAnswer(invocation -> {
+            embeddedKafkaBroker.getKafkaServers().forEach(s -> s.shutdown());
+            embeddedKafkaBroker.getKafkaServers().forEach(s -> s.awaitShutdown());
+            return null;
+        }).when(problemInjection).beforePublishingMessage();
+
+        doAnswer(invocation -> {
+            embeddedKafkaBroker.getKafkaServers().forEach(s -> s.startup());
+            return null;
+        }).when(problemInjection).beforeReturning();
+
+        TemperatureMeasurement measurement = new TemperatureMeasurement(11);
+        assertThatThrownBy(() -> temperatureMonitoring.monitor(measurement)).isExactlyInstanceOf(org.springframework.messaging.MessageHandlingException.class);
         assertThat(repository.findAll()).isEmpty();
         Awaitility.await().untilAsserted(() -> assertThat(temperatureAlarm).isNull());
     }
