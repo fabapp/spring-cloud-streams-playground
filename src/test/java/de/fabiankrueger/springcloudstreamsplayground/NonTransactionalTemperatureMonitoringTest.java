@@ -50,7 +50,7 @@ class NonTransactionalTemperatureMonitoringTest {
     @Autowired
     private TemperatureAlarmRepository repository;
     @MockBean
-    private MeanExceptionThrower exceptionThrower;
+    private ProblemInjection problemInjection;
 
     @Test
     public void happyPath() {
@@ -63,7 +63,7 @@ class NonTransactionalTemperatureMonitoringTest {
     @Test
     public void unhappyPath() {
         RuntimeException exception = new RuntimeException("Mehehehe");
-        doThrow(exception).when(exceptionThrower).beforePublishMessage();
+        doThrow(exception).when(problemInjection).beforeReturning();
         TemperatureMeasurement measurement = new TemperatureMeasurement(11);
         assertThatThrownBy(() -> temperatureMonitoring.monitor(measurement)).isSameAs(exception);
         assertThat(repository.findAll()).isEmpty();

@@ -10,7 +10,7 @@ public class TemperatureMonitoring {
 
   private final TemperatureAlarmRepository alarmRepository;
   private final TemperatureAlarmOutboundAdapter alarmOutboundAdapter;
-  private final MeanExceptionThrower exceptionThrower;
+  private final ProblemInjection problemInjection;
 
   @Transactional(rollbackFor = RuntimeException.class)
   public void monitor(TemperatureMeasurement measurement) {
@@ -19,7 +19,7 @@ public class TemperatureMonitoring {
       temperatureAlarm.setTemperature(measurement.getDegreeCelsius());
       alarmRepository.save(temperatureAlarm);
       alarmOutboundAdapter.send(temperatureAlarm);
-      exceptionThrower.beforePublishMessage();
+      problemInjection.beforeReturning();
     }
   }
 }
